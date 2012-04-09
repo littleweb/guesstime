@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>yclass.com</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+body,html{margin:0;padding:0;font-size:12px;font-family:Arial;font:12px/1 Helvetica, Tahoma, Arial, \5b8b\4f53, sans-serif;background:#fff;overflow:hidden;}
+.outbox{width:440px;background:#5D5D5D;margin:0 auto;position:relative;overflow:hidden;display:none;}
+.inbox{
+    background:url(bg.jpg) repeat;
+    margin:10px;
+    height:500px;
+    overflow:hidden;    
+}
+.settime{
+    width:242px;height:86px;
+    background:url(set.png) no-repeat;
+    _background:none;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='set.png',sizingMethod='scale');
+    position:absolute; 
+    top:20px;left:50%;margin-left:-121px;
+}
+.settime span{
+    display:block;
+    color:#fff;
+    font:bold 64px/1 verdana;
+    position:relative; 
+    left:140px;
+    top:5px;
+}
+.info{
+    height:60px;
+    position:relative; 
+    top:100px;
+}
+.info img{
+    width:208px;
+    height:39px;
+    background:url(info.png) no-repeat;
+    _background:none;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='info.png',sizingMethod='scale');
+    position:absolute; 
+    top:5px;left:-50%;margin-left:-104px;
+}
+.tip{
+    width:139px;height:47px;
+    background:url(tip.png) no-repeat;
+    _background:none;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='tip.png',sizingMethod='scale');
+    position:absolute; 
+    left:800px;bottom:-160px;z-index:10;
+}
+.btn{
+    position:absolute; 
+    left:50%;margin-left:-117px;
+    top:150px;
+    width:235px;
+    height:235px;
+    overflow:hidden;
+}
+.btn img{
+    cursor:pointer;
+    width:235px;
+    height:940px;
+    background:url(btn.png) no-repeat;
+    _background:none;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='btn.png',sizingMethod='scale');
+}
+.bar{
+    width:359px;
+    height:140px;
+    bottom:10px;
+    position:absolute; 
+    left:50%;margin-left:-180px;
+    background:url(bar.png) no-repeat;
+    _background:none;
+    _filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bar.png',sizingMethod='scale');
+}
+.go_down img{
+    margin-top:-235px;
+}
+.stop img{
+    margin-top:-470px;
+}
+.stop_down img{
+    margin-top:-705px;
+}
+.bar{display:none;}
+.bar p{margin:0;padding:0;color:#fff;font:bold 20px/1 verdana;height:30px;}
+.bar .pos{position:relative; left:85px;top:10px}
+.bar p span{font-size:20px;color:#80ff00;margin-left:10px;}
+</style>
+<script type="text/javascript" src="yclass.js"></script>
+<script type="text/javascript" src="imgloader.js"></script>
+</head>
+<body>
+ <div class="outbox" id="appout">
+    <div class="inbox">
+        <div class="settime">
+            <span id="time">9</span>
+        </div>
+        <div class="info">
+            <img src="empty.gif" id="query" />
+        </div>
+        <div class="btn" id="start">
+            <img src="empty.gif" alt="" />
+        </div>
+        <div class="tip" id="tip"></div>
+    </div>
+    <div class="bar" id="bar">
+        <div class="pos">
+            <p id="settime">2</p>
+            <p id="gettime">5.235</p>
+            <p id="diff">2.345</p>
+            <p id="level">5</p>        
+        </div>
+    </div>
+ </div>   
+</body>
+<script type="text/javascript">
+//<![CDATA[
+Class('AgainstTime', {
+    index:function (){
+        this.get('#start').hover(function (){
+            this.className='btn '+(this.className.indexOf('stop')>-1?'stop':'go')+'_down'            
+        }, function (){
+            var isstart = this.className.indexOf('stop')==-1; 
+            this.className='btn '+(isstart?'':'stop')
+        }).mousedown(function (e, G){
+            var isstart = this.className.indexOf('stop')==-1;
+            isstart ? G.start() : G.end();
+            this.className='btn '+(isstart?'stop_down':'go_down')
+        });
+        this.cache=[];
+        this.setRnd();
+    },
+    start: function (){
+        this.startTime = +new Date;
+        var x=this.one('#query');
+        this.hide();
+        this.fx(function (f){
+            x.style.left=f(-50,50)+'%'
+        });
+    },
+    end: function (){
+        this.show((new Date-this.startTime)/1000);
+        this.setRnd();
+        var x=this.one('#query');
+        this.fx(function (f){
+            x.style.left=f(50,-50)+'%'
+        },{mx:2});
+    },
+    show: function (get){
+        var node = this.get('#bar').setStyle('bottom:-500px').show().one();
+        this.get('#settime').html(this.time);
+        this.get('#gettime').html(get);
+        var diff = Math.abs(get-this.time).toFixed(3);
+        this.get('#diff').html(diff+(this.topDiff ? ('<span>(历史最准: '+this.topDiff+')</span>') : ''));
+        this.cache.push(diff);
+        this.cache.sort(Array.up);
+        var lv = this.cache.indexOf(diff)+1;
+        this.get('#level').html(lv);
+        this.fx(function (f, i){
+            node.style.bottom = f(-500, 20) + 'px'
+        }, {mx: 1,end: function (){
+            if (lv==1) {
+                var tip = this.one('#tip');
+                this.topDiff = diff;
+                this.fx(function (f, i){
+                    tip.style.left = f(250, 13)+'px';
+                    tip.style.bottom = f(-150, 160)+Math.sin(i*Math.PI)*200+'px';
+                })
+            }            
+        }})
+    },
+    hide: function (){
+        var node = this.get('#bar').one();
+        this.fx(function (f, i){
+            node.style.bottom = f(10, -500)+'px'
+        },{mx:1,end: function (){
+            node.style.display = 'none';
+        }})        
+        this.get('#tip').setStyle('left:900px')
+    },
+    setRnd: function (){
+        this.time = Math.floor(Math.random()*9+1);
+        this.get('#time').html(this.time);
+    }
+});
+Class({
+    ready: true,
+    index:function (){
+        var loader = this.lib.AppImageLoader();
+        loader.lastFx = false;
+        loader.end = function (){
+            this.lib.AgainstTime();
+            this.get([document.body,document.documentElement]).setStyle('background:#000');
+            this.get('#appout').show();
+        };
+        loader.load('bg.jpg,bar.png,btn.png,empty.gif,info.png,set.png,tip.png');
+    }    
+});
+
+ //]]>
+</script>
+</html>
