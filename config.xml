@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns		= "http://www.w3.org/ns/widgets"
+	xmlns:gap	= "http://phonegap.com/ns/1.0"
+	id		= "com.phonegap.getting.started"
+	version 	= "1.0.0">
+
+	<name>计时达人</name>
+
+	<description>
+		这是个非常有趣的应用，可以测试你预估时间的准确度。
+	</description>
+
+	<author href="http://xiaoweb.org"
+		email="girlblank@gmail.com">
+		小web
+	</author>
+
+	<icon src="icon.png" gap:role="default" />
+
+	<feature name="http://api.phonegap.com/1.0/geolocation"/>
+	<feature name="http://api.phonegap.com/1.0/network"/>
+
+	<preference name="orientation" value="portrait" />
+</widget>
